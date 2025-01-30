@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 class HomeCollectionViewCell: UICollectionViewCell {
     
@@ -36,6 +37,14 @@ class HomeCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    var ratingsLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.textAlignment = .left
+        label.font = .systemFont(ofSize: 16, weight: .bold)
+        return label
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -46,7 +55,6 @@ class HomeCollectionViewCell: UICollectionViewCell {
     }
     
     private func setup() {
-        
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(10)
@@ -64,6 +72,27 @@ class HomeCollectionViewCell: UICollectionViewCell {
             make.left.equalToSuperview().inset(20)
             make.bottom.equalToSuperview().inset(10)
         }
+        contentView.addSubview(ratingsLabel)
+        ratingsLabel.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(5)
+            make.right.equalToSuperview().inset(20)
+            make.bottom.equalToSuperview().inset(10)
+        }
+        contentView.backgroundColor = .white
+        contentView.layer.cornerRadius = 10
+        contentView.layer.shadowColor = UIColor.black.cgColor
+        contentView.layer.shadowOpacity = 0.5
+        contentView.layer.shadowRadius = 5
+        contentView.layer.shadowOffset = CGSize(width: 0, height: 2)
+    }
+    
+    func configure(with model: Product){
+        titleLabel.text = model.title
+        priceLabel.text = "$\(model.price)"
+        guard let url = URL(string: model.images[0]) else { return }
+        imageView.kf.setImage(with: url)
+        ratingsLabel.text = "★ \(model.rating)"
     }
     
 }
+

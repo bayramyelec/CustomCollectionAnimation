@@ -7,7 +7,6 @@
 
 import UIKit
 import SnapKit
-import Kingfisher
 
 class HomeVC: UIViewController {
     
@@ -20,17 +19,9 @@ class HomeVC: UIViewController {
         return collectionView
     }()
     
-    private var titleFontSize: CGFloat {
-        return isSingleColumn ? 18 : 14
-    }
-    
-    private var priceFontSize: CGFloat {
-        return isSingleColumn ? 16 : 12
-    }
-    
     var viewModel = HomeViewModel()
     
-    private var isSingleColumn: Bool = true
+    internal var isSingleColumn: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,7 +52,6 @@ class HomeVC: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "rectangle.grid.2x2"), style: .plain, target: self, action: #selector(rightButtonTapped))
     }
     
-    
     @objc func rightButtonTapped() {
         isSingleColumn.toggle()
         navigationItem.rightBarButtonItem?.image = isSingleColumn ? UIImage(systemName: "rectangle.grid.2x2") : UIImage(systemName: "rectangle.grid.1x2")
@@ -72,6 +62,7 @@ class HomeVC: UIViewController {
         
         collectionView.setCollectionViewLayout(newLayout, animated: true)
         collectionView.reloadData()
+        
     }
     
     private func fetchProducts() {
@@ -93,29 +84,18 @@ extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeCollectionViewCell.identifier, for: indexPath) as! HomeCollectionViewCell
         let item = viewModel.products[indexPath.item]
-        
-        cell.titleLabel.text = item.title
-        cell.priceLabel.text = "$\(item.price)"
-        
-        cell.titleLabel.font = UIFont.boldSystemFont(ofSize: titleFontSize)
-        cell.priceLabel.font = UIFont.boldSystemFont(ofSize: priceFontSize)
-        
-        cell.backgroundColor = .systemGray6
-        
-        let url = URL(string: item.images.first ?? "")
-        cell.imageView.kf.setImage(with: url)
-        
-        cell.layer.cornerRadius = 20
-        cell.layer.shadowColor = UIColor.black.cgColor
-        cell.layer.shadowOpacity = 0.5
-        cell.layer.shadowRadius = 5
-        cell.layer.shadowOffset = CGSize(width: 0, height: 2)
-        
+        cell.configure(with: item)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = isSingleColumn ? screenWidth / 1.1 : screenWidth / 2.2
         return CGSize(width: width, height: screenWidth / 1.7)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let vc = DetailVC()
+        vc.product = viewModel.products[indexPath.item]
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
